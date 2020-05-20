@@ -1,4 +1,0 @@
-= YASC
-:toc:
-
-YASC is short for Yet Another Score Card.
