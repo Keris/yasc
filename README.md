@@ -1,8 +1,6 @@
-YASC
-====
+YASC: Yet Another Score Card
+============================
 [![Documentation Status](https://readthedocs.org/projects/yasc/badge/?version=latest)](https://yasc.readthedocs.io/en/latest/?badge=latest)
-
-YASC is short for Yet Another Score Card.
 
 Why do I build YASC?
 -----------------
