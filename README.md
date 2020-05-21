@@ -3,17 +3,15 @@ YASC
 
 YASC is short for Yet Another Score Card.
 
-Why I build YASC?
+Why do I build YASC?
 -----------------
 
-In my daily work, the most work I do is to build a score card model and there is already a tool named [scorecardpy](https://github.com/ShichenXie/scorecardpy) out of the shelf. But after serveral times of using of it, I found some flaws of it:
+In my daily work, the most part of my work is to build a score card model and I've found I write some code repeatedly almost every time, so why don't I build a package? Before doing this I found there is already a tool named [scorecardpy](https://github.com/ShichenXie/scorecardpy) out of the shelf with 300+ stars on Github. But after serveral times of using of it, I've found it cannot well fit my taste:
 
 - Not very Pythonic
 - No documents
 - The plots are not very pretty
 - ...
-
-Based on above reasons I try to build a new one.
 
 
 Features
@@ -39,12 +37,11 @@ Contribute
 ----------
 
 - Issue Tracker: https://github.com/Keris/yasc/issues
-- Source Code: https://github.com/Keris/yasc
 
 Support
 -------
 
-If you are having issues, please let us know.
+If you are having any issues, please let us know.
 
 License
 -------
