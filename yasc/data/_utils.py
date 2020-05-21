@@ -1,10 +1,10 @@
 # Author: Liqiang Du <keris.du@gmail.com>
 import pandas as pd
-import os
+import pkg_resources
 
 
 def german_data():
     """Return german data as a data frame."""
-    this_dir = os.path.dirname(os.path.realpath(__file__))
-    df = pd.read_csv(os.path.join(this_dir, "german.csv"))
+    filename = pkg_resources.resource_filename("yasc", "data/german.csv")
+    df = pd.read_csv(filename)
     return df

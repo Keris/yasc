@@ -1,5 +1,7 @@
-include README.md
+include *.md *.rst
 include LICENSE
 include requirements.txt
 include requirements-dev.txt
-global-include german.csv
+
+# Include data files
+recursive-include data *.csv
