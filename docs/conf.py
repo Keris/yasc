@@ -21,6 +21,8 @@ project = 'YASC'
 copyright = '2020, Liqiang Du'
 author = 'Liqiang Du'
 
+# Fix "contents.rst not found"
+master_doc = 'index'
 
 # -- General configuration ---------------------------------------------------
 
