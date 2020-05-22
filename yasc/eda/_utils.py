@@ -3,102 +3,207 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
+from pandas.api.types import is_numeric_dtype, is_object_dtype
 
 
-def missing_stat(data, x=None):
+def missing_stat(data, columns=None, show_print=True):
     """Return missing values' statistics.
 
     Only columns with missing values are included in the result.
 
     Parameters
     ----------
-    data : DataFrame.
+    data : :class:`DataFrame`
         A data frame to make statistics.
-    x : str or list, optional
+    columns : :class:`str` or :class:`list`, optional
         A column name or a list of column names. Defaults to None.
+    show_print : bool, optional
+        Whether to print summay information. Defaults to True.
 
     Returns
     -------
-    A string if x is passed as a str else a DataFrame.
+    A string if :param:`columns` is passed as a :class:`str` else a :class:`DataFrame`.
 
     Examples
     --------
 
-    Check missing statistics of total DataFrame:
+    Check missing statistics of all columns:
 
         >>> from yasc.eda import missing_stat
         >>> import pandas as pd
         >>> import numpy as np
         >>> df = pd.DataFrame({"a": [1, np.nan, np.nan], "b": [2, np.nan, 3], "c": [4, 5, 6]})
         >>> missing_stat(df)
-          Column #Missing  MissingRate   Dtype
-        0      a        2     0.666667  float64
-        1      b        1     0.333333  float64
+          Column #missing  missing_rate
+        0      a        2      0.666667
+        1      b        1      0.333333
 
     Check missing statistics of one column:
         >>> missing_stat(df, "a")
-        'Column a of dtype float64, 2 missings (0.67)'
+        Column a of dtype float64, 2 missings (0.67)
 
     """
-    stat_df = pd.DataFrame(
-        columns=("Column", "#Missing", "MissingRate", "Dtype")
-    )
     _len = len(data)
-    if x is None:
+    if columns is None:
         s = data.isnull().sum()  # Series
     else:
-        s = data[x].isnull().sum()
-    if isinstance(s, np.int64):  # x is passed as a str
-        return "Column {} of dtype {}, {} missings ({:.2f})".format(
-            x, data[x].dtype, s, s / _len
+        s = data[columns].isnull().sum()
+    if isinstance(s, np.int64):  # columns is passed as a str
+        print(
+            "Column {} of dtype {}, {} missing(s) ({:.2f})".format(
+                columns, data[columns].dtype, s, s / _len
+            )
         )
-    templist = []
-    for idx in s[s > 0].index:
-        templist.append(
-            {
-                "Column": idx,
-                "#Missing": s[idx],
-                "MissingRate": s[idx] / _len,
-                "Dtype": data[idx].dtype,
-            }
-        )
-    stat_df = stat_df.append(templist, ignore_index=True)
-    return stat_df.sort_values(by="#Missing")
+    else:
+        stat_df = pd.DataFrame(s).reset_index()
+        stat_df.rename(columns={"index": "column", 0: "#missing"}, inplace=True)
+        stat_df["missing_rate"] = stat_df["#missing"] / _len
+        n_missing_columns = len(stat_df[stat_df["#missing"] > 0])
+        if show_print:
+            if n_missing_columns:
+                print(
+                    "{} columns, of which {} columns with missing values".format(
+                        len(data.columns), n_missing_columns
+                    )
+                )
+            else:
+                print("No missing values")
+        return stat_df.sort_values(by="#missing")
 
 
-def missing_plot(data, is_missing_stat=False, kws=None):
-    """Plot missing statistics of data.
+def numeric_stat(data, percentiles=None):
+    """Describe numeric columns.
 
     Parameters
     ----------
     data : DataFrame
-        Observed data or missing values statistics.
-    is_missing_stat : bool, optional
-        Observed data if False else missing values statistics. Defaults to False.
-    kws : dict, optional
-        Keyword arguments for :func:`barplot`.
+        Observed data.
+    percentils : list-like of numbers, optional
+        The percentiles to include in the ouput.
 
     Returns
     -------
-    ax : matplotlib Axes or None
-         Returns the Axes object with the plot for further tweaking.
+    desc : DataFrame
+        A descriptive statistics for numeric columns.
 
     """
-    stat = data if is_missing_stat else missing_stat(data)
-    if not stat.empty:  # Plot only there are missing values
-        kws = {} if kws is None else kws.copy()
-        ax = sns.barplot(x="Column", y="#Missing", data=stat, **kws)
-        for a, b in zip(range(len(stat.Column)), stat["#Missing"]):
-            plt.text(a, b + 0.02, b, ha="center", va="bottom")
-        plt.plot(range(len(stat.Column)), stat["MissingRate"], "r")
-        plt.plot(range(len(stat.Column)), stat["MissingRate"], "rs")
-        for a, b in zip(range(len(stat.Column)), stat["MissingRate"]):
-            plt.text(
-                a,
-                b + 0.02,
-                "missing_rate: {:.2f}".format(b),
-                ha="center",
-                va="bottom",
-            )
-        return ax
-    return None
+    desc = data.describe(percentiles, include=np.number)
+    return desc
+
+
+def categorical_stat(data):
+    """Generate descriptive statistics for categorical columns.
+
+    Categorical columns here are columns of dtype `dtype('O')`.
+
+    Parameters
+    ----------
+    data : DataFrame
+        Observed Data.
+
+    Returns
+    -------
+    desc : DataFrame
+        A descriptive statistics for categorical columns.
+
+    """
+    desc = data.describe(include=np.object)
+    return desc
+
+
+def describe(data, percentiles=None):
+    """Generate descriptive statistics.
+
+    Parameters
+    ----------
+    data : DataFrame
+        Observed data
+    percentiles : list-like of numbers, optional
+        The percentiles to include in the output. Defaults to None.
+
+    Returns
+    -------
+    :class:`pandas.core.frame.DataFrame`
+        Descriptive statistics including numeric columns, categorical columns
+        and missing values.
+    """
+    col_dtypes = pd.DataFrame(data.dtypes)
+    col_dtypes.rename(columns={0: "dtype"}, inplace=True)
+
+    def get_type(dtype):
+        if is_numeric_dtype(dtype):
+            return "numeric"
+        elif is_object_dtype(dtype):
+            return "categorical"
+        else:
+            return str(dtype)
+
+    col_dtypes["type"] = col_dtypes.dtype.apply(get_type)
+    desc = data.describe(percentiles, include="all")
+    result_df = pd.DataFrame(columns=desc.columns)
+    missing_desc = (
+        missing_stat(data, show_print=False).sort_index().set_index("column")
+    )
+    result_df = result_df.append(col_dtypes.dtype)
+    result_df = result_df.append(col_dtypes.type)
+    result_df = result_df.append(missing_desc["#missing"])
+    result_df = result_df.append(missing_desc.missing_rate)
+    result_df = result_df.append(desc)
+
+    return result_df
+
+
+def corr_analysis(
+    data, tight_layout=False, show_plot=False, title=None, rot=None, **kwargs
+):
+    """Correlation analysis.
+
+    Parameters
+    ----------
+    data : DataFrame
+        Observed data.
+    tight_layout : bool, optional
+        Whether to make figure tight layout. Defaults to False.
+    show_plot : bool, optional
+        Whether to show heatmap of correlation matrix.
+    title : :class:`str`
+        Title of heatmap of correlation matrix. Defautls to `None`.
+    rot : int
+        Degrees of rotation for `xticklabels`.
+    kwargs : Keyword arguments
+        All keyword arguments that are passed to :func:`seaborn.heatmap`.
+
+    Returns
+    -------
+    :class:`tuple`
+        Return correlation matrix and axes object with the heatmap.
+
+    """
+    if title is None:
+        title = "Heatmap of correlation matrix"
+    if rot is None:
+        rot = 45
+    numeric_cols = [
+        col for col in data.columns if is_numeric_dtype(data[col].dtype)
+    ]
+    corr = data[numeric_cols].corr()
+    fig, ax = plt.subplots()
+    ax = sns.heatmap(
+        corr,
+        vmin=-1,
+        vmax=1,
+        center=0,
+        annot=True,
+        cmap="YlGnBu",
+        ax=ax,
+        **kwargs,
+    )
+    ax.set_title(title)
+    plt.setp(
+        ax.get_xticklabels(), rotation=rot, ha="right", rotation_mode="anchor"
+    )
+    if tight_layout:
+        fig.tight_layout()
+    if show_plot:
+        plt.show()
+    return corr, ax
