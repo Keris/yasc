@@ -6,10 +6,10 @@ import matplotlib.pyplot as plt
 from pandas.api.types import is_numeric_dtype, is_object_dtype
 
 
-def missing_stat(data, columns=None, show_print=True):
+def missing_stat(
+    data, columns=None, show_print=True, only_missing_columns=False
+):
     """Return missing values' statistics.
-
-    Only columns with missing values are included in the result.
 
     Parameters
     ----------
@@ -19,6 +19,9 @@ def missing_stat(data, columns=None, show_print=True):
         A column name or a list of column names. Defaults to None.
     show_print : bool, optional
         Whether to print summay information. Defaults to True.
+    only_missing_columns : bool, optional
+        Whether to only include columns with missing values in the output.
+        Defaults to False.
 
     Returns
     -------
@@ -57,6 +60,8 @@ def missing_stat(data, columns=None, show_print=True):
     else:
         stat_df = pd.DataFrame(s).reset_index()
         stat_df.rename(columns={"index": "column", 0: "#missing"}, inplace=True)
+        if only_missing_columns:
+            stat_df = stat_df[stat_df["#missing"] > 0]
         stat_df["missing_rate"] = stat_df["#missing"] / _len
         n_missing_columns = len(stat_df[stat_df["#missing"] > 0])
         if show_print:
