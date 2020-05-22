@@ -14,14 +14,14 @@ def missing_stat(
     Parameters
     ----------
     data : :class:`DataFrame`
-        A data frame to make statistics.
+        Observed data.
     columns : :class:`str` or :class:`list`, optional
-        A column name or a list of column names. Defaults to None.
+        A column name or a list of column names. Defaults to ``None``.
     show_print : bool, optional
-        Whether to print summay information. Defaults to True.
+        Whether to print summay information. Defaults to ``True``.
     only_missing_columns : bool, optional
         Whether to only include columns with missing values in the output.
-        Defaults to False.
+        Defaults to ``False``.
 
     Returns
     -------
@@ -35,13 +35,17 @@ def missing_stat(
         >>> from yasc.eda import missing_stat
         >>> import pandas as pd
         >>> import numpy as np
-        >>> df = pd.DataFrame({"a": [1, np.nan, np.nan], "b": [2, np.nan, 3], "c": [4, 5, 6]})
+        >>> df = pd.DataFrame({"a": [1, np.nan, np.nan],
+        ...                    "b": [2, np.nan, 3], "c": [4, 5, 6]})
         >>> missing_stat(df)
-          Column #missing  missing_rate
-        0      a        2      0.666667
-        1      b        1      0.333333
+        3 columns, of which 2 columns with missing values
+          column  #missing  missing_rate
+        2      c         0      0.000000
+        1      b         1      0.333333
+        0      a         2      0.666667
 
-    Check missing statistics of one column:
+    Check missing statistics of a single column:
+
         >>> missing_stat(df, "a")
         Column a of dtype float64, 2 missings (0.67)
 
@@ -124,11 +128,11 @@ def describe(data, percentiles=None):
     data : DataFrame
         Observed data
     percentiles : list-like of numbers, optional
-        The percentiles to include in the output. Defaults to None.
+        The percentiles to include in the output. Defaults to ``None``.
 
     Returns
     -------
-    :class:`pandas.core.frame.DataFrame`
+    result_df : :class:`pandas.core.frame.DataFrame`
         Descriptive statistics including numeric columns, categorical columns
         and missing values.
     """
@@ -168,11 +172,11 @@ def corr_analysis(
     data : DataFrame
         Observed data.
     tight_layout : bool, optional
-        Whether to make figure tight layout. Defaults to False.
+        Whether to make figure tight layout. Defaults to ``False``.
     show_plot : bool, optional
         Whether to show heatmap of correlation matrix.
     title : :class:`str`
-        Title of heatmap of correlation matrix. Defautls to `None`.
+        Title of heatmap of correlation matrix. Defautls to ``None``.
     rot : int
         Degrees of rotation for `xticklabels`.
     kwargs : Keyword arguments
@@ -181,7 +185,17 @@ def corr_analysis(
     Returns
     -------
     :class:`tuple`
-        Return correlation matrix and axes object with the heatmap.
+        Returns correlation matrix and axes object with the heatmap.
+
+    Examples
+    --------
+
+    Plot a heatmap of correlation matrix of german credit data.
+
+        >>> from yasc.data import german_data
+        >>> from yasc.eda import corr_analysis
+        >>> data = german_data()
+        >>> corr, ax = corr_analysis(data)
 
     """
     if title is None:
