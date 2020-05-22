@@ -25,7 +25,7 @@ def missing_stat(
 
     Returns
     -------
-    A string if :param:`columns` is passed as a :class:`str` else a :class:`DataFrame`.
+    A string if `columns` is passed as a :class:`str` else a :class:`DataFrame`.
 
     Examples
     --------
