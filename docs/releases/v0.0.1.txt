@@ -1,0 +1,16 @@
+v0.0.1 (May 2020)
+-----------------
+
+This is the first release only with a data module providing a data frame of
+`german credit data <https://archive.ics.uci.edu/ml/datasets/statlog+(german+credit+data)>`_
+and an exploratory data analysis (EDA) module to generate descriptive statistics and analyze correlation.
+
+New functions
+^^^^^^^^^^^^^
+
+- ``german_data()``
+- ``missing_stat()``
+- ``numeric_stat()``
+- ``categorical_stat()``
+- ``describe()``
+- ``corr_analysis()``
