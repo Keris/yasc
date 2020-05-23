@@ -1,0 +1,6 @@
+*_files/
+_build/
+generated/
+examples/
+example_thumbs/
+get_started_with_eda.rst
