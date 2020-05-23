@@ -14,6 +14,7 @@ import os
 import sys
 import sphinx_bootstrap_theme
 import matplotlib as mpl
+from subprocess import check_call as sh
 mpl.use("Agg")
 sys.path.insert(0, os.path.abspath('.'))
 
@@ -112,3 +113,6 @@ html_show_sourcelink = False
 def setup(app):
     app.add_js_file('copybutton.js')
     app.add_css_file('style.css')
+
+    # Build tutorials
+    sh(["make -C tutorial"], shell=True)
