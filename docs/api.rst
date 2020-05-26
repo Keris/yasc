@@ -67,3 +67,12 @@ Score card
 
     check_target
     mono_bin
+
+Plot utilities
+^^^^^^^^^^^^^^
+
+.. autosummary::
+    :toctree: generated/
+
+    rocplot
+    ksplot
