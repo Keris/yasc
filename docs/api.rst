@@ -76,3 +76,4 @@ Plot utilities
 
     rocplot
     ksplot
+    woebinplot
