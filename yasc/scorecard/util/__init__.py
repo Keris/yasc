@@ -1,3 +1,3 @@
 # Author: Liqiang Du
-from .check import check_target
-from .plot import rocplot, ksplot
+from ._check import check_target
+from ._plot import rocplot, ksplot, woebinplot

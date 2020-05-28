@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 from scipy import stats
 
-from ..scorecard.util import check_target
+from ..scorecard.util._check import check_target
 
 
 __all__ = ["mono_bin"]
@@ -51,7 +51,7 @@ def mono_bin(Y, X, n=20, precision=3, duplicates="raise"):
         (24.0, 72.0]   0.620240  0.097466  0.168117  [-inf, 12, 24, 72, inf]
 
     """
-    check_target(Y)
+    check_target(Y, inplace=True)
     total_bad = Y.sum()
     total_good = Y.count() - total_bad
     rho = 0
